@@ -57,6 +57,8 @@
 
             var name = document.getElementById("name");
             name.addEventListener("blur", function() {
+                if (document.getElementById("frame").value == 'xyz') ctx.fillStyle = 'white'
+                else ctx.fillStyle = 'black'
                 ctx.font = "18px courier";
                 ctx.fillText(name.value, 25.5, 32);
                 ctx.fillText(name.value, 25.5, 32);
@@ -145,7 +147,7 @@
         }
 
         function getFrame(frame) {
-            let frames = ["normal", "effect", "ritual", "spell", "trap", "fusion", "obelisk", "osiris", "ra"];
+            let frames = ["normal", "effect", "ritual", "spell", "trap", "fusion", "synchro", "xyz", "obelisk", "osiris", "ra"];
             return frames.includes(frame) ? "colors/color-" + frame + ".svg" : "";
         }
 
@@ -179,6 +181,8 @@
                 <option value="spell">Spell</option>
                 <option value="trap">Trap</option>
                 <option value="fusion">Fusion Monster</option>
+                <option value="synchro">Synchro Monster</option>
+                <option value="xyz">Xyz Monster</option>
                 <option value="obelisk">Obelisk</option>
                 <option value="osiris">Osiris</option>
                 <option value="ra">Ra</option>
