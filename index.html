@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DM9 Card Maker</title>
+    <style>
+        #myCanvas {
+            border: solid 1px black;
+            letter-spacing: -0.4px;
+        }
+        
+        .columns {
+            display: inline-block;
+            margin-left: 15px;
+            margin-top: 15px;
+        }
+        
+        form {
+            margin-top: 5px;
+            display: inline-block;
+            font-size: 95%;
+            line-height: 65%;
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            var canvas = document.getElementById("myCanvas");
+            var ctx = canvas.getContext("2d");
+            var grayImage = new Image();
+            grayImage.onload = () => {
+                ctx.drawImage(grayImage, 0, 0);
+            };
+            grayImage.src = "frame-gray.svg";
+
+            var frame = document.getElementById("frame");
+            frame.addEventListener("blur", function() {
+                let frameImage = new Image();
+                let artworkImage = new Image();
+                artworkImage.onload = () => {
+                    ctx.drawImage(frameImage, 0, 0);
+                    ctx.drawImage(artworkImage, 0, 0);
+                }
+                const frameValue = document.getElementById("frame").value;
+                frameImage.src = getFrame(frameValue);
+                artworkImage.src = "frame-artwork.svg";
+                toggleInputs(frameValue);
+                
+                if (frameValue === "spell") {
+                    drawTypeIcon("type-spell.svg", ctx);
+                } else if (frameValue === "trap") {
+                    drawTypeIcon("type-trap.svg", ctx);
+                }
+            });
+
+            var name = document.getElementById("name");
+            name.addEventListener("blur", function() {
+                ctx.font = "18px courier";
+                ctx.fillText(name.value, 25.5, 32);
+                ctx.fillText(name.value, 25.5, 32);
+            });
+
+            var level = document.getElementById("level");
+            level.addEventListener("blur", function() {
+                drawLevelStars(ctx);
+            });
+
+            var type = document.getElementById("type");
+            type.addEventListener("blur", function() {
+                drawTypeIcon(getType(type.value), ctx);
+            });
+
+            var attr = document.getElementById("attribute");
+            attr.addEventListener("blur", function() {
+                drawTypeIcon(getAttr(attr.value), ctx);
+            });
+
+            var atk = document.getElementById("atk");
+            atk.addEventListener("blur", function() {
+                drawStat('ATK', atk.value, 112, 257, ctx);
+            });
+
+            var def = document.getElementById("def");
+            def.addEventListener("blur", function() {
+                drawStat('DEF', def.value, 112, 272, ctx);
+            });
+
+            var art = document.getElementById("artwork");
+            art.addEventListener("blur", function() {
+                let artImage = new Image();
+                artImage.onload = () => {
+                    let w = artImage.width;
+                    ctx.drawImage(artImage, 0, 0, w, w, 26, 74, 164, 164);
+                }
+                artImage.src = art.value;
+            });
+
+        };
+
+        function toggleInputs(frameValue) {
+            const disabled = (frameValue === "spell" || frameValue === "trap");
+            document.getElementById("level").disabled = disabled;
+            document.getElementById("type").disabled = disabled;
+            document.getElementById("attribute").disabled = disabled;
+            document.getElementById("atk").disabled = disabled;
+            document.getElementById("def").disabled = disabled;
+        }
+
+        function drawLevelStars(ctx) {
+            let levelStar = new Image();
+            levelStar.onload = () => {
+                let levelValue = document.getElementById("level").value;
+                let levelConstant = levelValue == 12 ? 176 : 168
+                for (let i = 0; i < levelValue; i++) {
+                    ctx.drawImage(levelStar, (levelConstant - (i * 16)), 0);
+                }
+            }
+            levelStar.src = "level-star.svg";
+        }
+
+        function drawTypeIcon(src, ctx) {
+            let typeImage = new Image();
+            typeImage.onload = () => {
+                if (src.substring(0, 6) == 'type-s' || src.substring(0, 6) == 'type-t')
+                    ctx.drawImage(typeImage, 0,0);
+                else
+                ctx.drawImage(typeImage, src.substring(0, 3) == 'att' ? 63 : 32, 245, 31, 31);
+            }
+            typeImage.src = src;
+        }
+
+        function drawStat(label, value, x, y, ctx) {
+            ctx.font = "bolder 3.3mm Lucida Console";
+            //ctx.fillText(label, x, y);
+            let labelSplit = label.split("");
+            let valueSplit = value.split("");
+            for (let i = 0; i < labelSplit.length; i++) {
+                ctx.fillText(labelSplit[i], x+ (i*9), y)
+            }
+            for (let j = 0; j < valueSplit.length; j++) {
+                ctx.fillText(valueSplit[j], x+38 + (j*10.5) + ((4-valueSplit.length) * 10.5), y)
+            }
+        }
+
+        function getFrame(frame) {
+            let frames = ["normal", "effect", "ritual", "spell", "trap", "fusion", "obelisk", "osiris", "ra"];
+            return frames.includes(frame) ? "colors/color-" + frame + ".svg" : "";
+        }
+
+        function getType(type) {
+            let types = ["aqua", "beast", "beast-warrior", "cyberse", "dinosaur", "dragon", "fairy",
+                "fiend", "fish", "insect", "machine", "plant", "psychic", "pyro", "reptile", "rock",
+                "sea-serpent", "spellcaster", "thunder", "warrior", "winged-beast", "wyrm", "zombie"];
+            //return types.includes(type) ? "types/type-" + type + ".svg" : "";
+            return types.includes(type) ? "types/type-" + type + ".png" : "";
+        }
+
+        function getAttr(attr) {
+            let attrs = ["dark", "divine", "dreams", "earth", "fiend", "fire", "forest", "light", "thunder", "water", "wind"];
+            //return attrs.includes(attr) ? "attrs/attr-" + attr + ".svg" : "";
+            return attrs.includes(attr) ? "attrs/attr-" + attr + ".png" : "";
+        }
+    </script>
+</head>
+
+<body>
+    <div class="columns">
+        <canvas id="myCanvas" width="216" height="286"></canvas>
+    </div>
+    <div>
+        <form action="#" class="columns">
+            <label for="frame">Card Type:</label>
+            <select name="frame" id="frame">
+                <option value="normal" selected>Normal Monster</option>
+                <option value="effect">Effect Monster</option>
+                <option value="ritual">Ritual Monster</option>
+                <option value="spell">Spell</option>
+                <option value="trap">Trap</option>
+                <option value="fusion">Fusion Monster</option>
+                <option value="obelisk">Obelisk</option>
+                <option value="osiris">Osiris</option>
+                <option value="ra">Ra</option>
+            </select>
+            <br /><br />
+            <label for="name">Name: </label>
+            <input type="text" id="name" name="name" maxlength="16" />
+            <br /><br /><label for="level">Level: </label>
+            <select name="level" id="level">
+                <!-- Level options -->
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+            <br /><br /><label for="type">Type: </label>
+            <select name="type" id="type">
+                <!-- Type options -->
+                <option value="aqua">Aqua</option>
+                <option value="beast">Beast</option>
+                <option value="beast-warrior">Beast-Warrior</option>
+                <!-- <option value="cyberse">Cyberse</option> -->
+                <option value="dinosaur">Dinosaur</option>
+                <option value="dragon">Dragon</option>
+                <option value="fairy">Fairy</option>
+                <option value="fiend">Fiend</option>
+                <option value="fish">Fish</option>
+                <option value="insect">Insect</option>
+                <option value="machine">Machine</option>
+                <option value="plant">Plant</option>
+                <!-- <option value="psychic">Psychic</option> -->
+                <option value="pyro">Pyro</option>
+                <option value="reptile">Reptile</option>
+                <option value="rock">Rock</option>      
+                <option value="sea-serpent">Sea Serpent</option>  
+                <option value="spellcaster">Spellcaster</option>
+                <option value="thunder">Thunder</option>
+                <option value="warrior">Warrior</option>
+                <option value="winged-beast">Winged Beast</option>
+                <!-- <option value="wyrm">Wyrm</option> -->
+                <option value="zombie">Zombie</option>
+            </select>
+            <br /><br /><label for="attribute">Attribute: </label>
+            <select name="attribute" id="attribute">
+                <option value="dark">DARK</option>
+                <option value="divine">DIVINE</option>
+                <option value="dreams">DREAMS</option>
+                <option value="earth">EARTH</option>
+                <option value="fiend">FIEND</option>
+                <option value="fire">FIRE</option>
+                <option value="forest">FOREST</option>
+                <option value="light">LIGHT</option>
+                <option value="thunder">THUNDER</option>
+                <option value="water">WATER</option>
+                <option value="wind">WIND</option>
+            </select>
+            <br /><br /><label for="atk">ATK:</label>
+            <input type="number" id="atk" name="atk" max="5000" min="0" step="50">
+            <br /><br /><label for="def">DEF:</label>
+            <input type="number" id="def" name="def" max="5000" min="0" step="50">
+            <br /><br /><label for="artwork">Artwork:</label>
+            <input type="text" id="artwork" name="artwork">
+            <br /><br />
+        </form>
+    </div>
+    <button id="savePng" disabled>Right-Click Image to Save</button>
+</body>
+
+</html>
